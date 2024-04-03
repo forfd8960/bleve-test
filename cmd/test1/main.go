@@ -8,28 +8,40 @@ import (
 )
 
 func main() {
-	// message := struct {
-	// 	Id   string
-	// 	From string
-	// 	Body string
-	// }{
-	// 	Id:   "example",
-	// 	From: "forfd8960@github.com",
-	// 	Body: "test with bleve indexing",
-	// }
+	messages := []struct {
+		Id   string
+		From string
+		Body string
+	}{
+		{
+			Id:   "index-example1",
+			From: "forfd8960@github.com",
+			Body: "test with bleve indexing",
+		},
+		{
+			Id:   "index-example2",
+			From: "forfd8960@github.com",
+			Body: "another document",
+		},
+	}
 
-	// mapping := bleve.NewIndexMapping()
-	// index, err := bleve.New("example.bleve", mapping)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// if err := index.Index(message.Id, message); err != nil {
-	// 	fmt.Printf("index err: %v\n", err)
-	// 	return
-	// }
+	mapping := bleve.NewIndexMapping()
+	index, err := bleve.New("example.bleve", mapping)
+	if err != nil {
+		panic(err)
+	}
 
-	index, _ := bleve.Open("example.bleve")
-	query := bleve.NewQueryStringQuery("indexing")
+	for _, msg := range messages {
+		if err := index.Index(msg.Id, msg); err != nil {
+			fmt.Printf("index err: %v\n", err)
+			return
+		}
+	}
+
+	fmt.Printf("index: %v has been successful build\n", index)
+
+	// index, _ = bleve.Open("example.bleve")
+	query := bleve.NewQueryStringQuery("another")
 	fmt.Printf("query: %v\n", *query)
 
 	searchRequest := bleve.NewSearchRequest(query)
@@ -54,7 +66,6 @@ func main() {
 			printResult(ht)
 		}
 	}
-
 }
 
 func printResult(hit *search.DocumentMatch) {
